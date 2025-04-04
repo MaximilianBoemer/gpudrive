@@ -36,7 +36,7 @@ class RandomPolicy:
         return random_action, None, None, None
 
 
-def load_policy(path_to_cpt, model_name, device, env=None):
+def load_policy(path_to_cpt, model_name, device, cfg_path, env=None):
     """Load a policy from a given path."""
 
     # Load the saved checkpoint
@@ -52,15 +52,34 @@ def load_policy(path_to_cpt, model_name, device, env=None):
 
         logging.info(f"Load model from {path_to_cpt}/{model_name}.pt")
 
-        # Create policy architecture from saved checkpoint
-        policy = NeuralNet(
-            input_dim=saved_cpt["model_arch"]["input_dim"],
-            action_dim=saved_cpt["action_dim"],
-            hidden_dim=saved_cpt["model_arch"]["hidden_dim"],
-        ).to(device)
+        # # Create policy architecture from saved checkpoint
+        # policy = NeuralNet(
+        #     input_dim=saved_cpt["model_arch"]["input_dim"],
+        #     action_dim=saved_cpt["action_dim"],
+        #     hidden_dim=saved_cpt["model_arch"]["hidden_dim"],
+        # ).to(device)
+        from gpudrive.networks.perm_eq_late_fusion import (
+            LateFusionNet,
+            LateFusionPolicy,
+        )
+        
+        def linear_schedule(initial_value: float):
+            """Linear learning rate schedule."""
+            def func(progress_remaining: float) -> float:
+                return progress_remaining * initial_value
+            return func
+        
+        policy = LateFusionPolicy(
+            observation_space=env.observation_space,
+            env_config=env.config,
+            exp_config=load_config(cfg_path),
+            action_space=env.action_space,
+            lr_schedule=linear_schedule(0.0)
+        ).to(device=device)
 
         # Load the model parameters
-        policy.load_state_dict(saved_cpt["parameters"])
+        # policy.load_state_dict(saved_cpt["parameters"])
+        policy.load_state_dict(saved_cpt)
 
         logging.info("Load model parameters")
 
@@ -117,7 +136,10 @@ def rollout(
         
         # Get actions for active agents
         if live_agent_mask.any():
-            action, _, _, _ = policy(
+            # action, _, _, _ = policy(
+            #     next_obs[live_agent_mask], deterministic=deterministic
+            # )
+            action, _, _ = policy(
                 next_obs[live_agent_mask], deterministic=deterministic
             )
 
