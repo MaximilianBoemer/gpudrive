@@ -32,7 +32,6 @@ def main():
     ckpt_path = "/n/fs/pci-sharedt/mb9385/workspace/gpudrive/policy_100024842"
     device = "cuda"
     
-
     # Dataset
     train_loader = SceneDataLoader(
         root=data_root,
