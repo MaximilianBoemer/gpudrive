@@ -28,9 +28,9 @@ def main():
     
     # Args to parse
     data_root = "data/processed/examples"
-    model_cfg_path = "baselines/ppo/config/ppo_base_sb3.yaml"
+    model_cfg_path = "baselines/ppo/config/ppo_base_sb3"
     ckpt_path = "/n/fs/pci-sharedt/mb9385/workspace/gpudrive/policy_100024842"
-    device = "cuda"
+    device = "cpu"
     
     # Dataset
     train_loader = SceneDataLoader(
