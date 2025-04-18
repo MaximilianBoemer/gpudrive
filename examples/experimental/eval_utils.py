@@ -139,7 +139,8 @@ def rollout(
             # action, _, _, _ = policy(
             #     next_obs[live_agent_mask], deterministic=deterministic
             # )
-            action, _, _ = policy(
+
+            action, value, log_prob = policy(
                 next_obs[live_agent_mask], deterministic=deterministic
             )
 
@@ -177,7 +178,7 @@ def rollout(
                         )
 
         # Update observations, dones, and infos
-        next_obs = env.get_obs()
+        next_obs = env.get_obs(t=time_step)
         dones = env.get_dones().bool()
         infos = env.get_infos()
         
