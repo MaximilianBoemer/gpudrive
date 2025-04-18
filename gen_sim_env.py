@@ -7,8 +7,8 @@ from gpudrive.datatypes.roadgraph import GlobalRoadGraphPoints
 from gpudrive.env.env_torch import GPUDriveTorchEnv
 from gpudrive.env.config import RenderConfig
 
-from scene_generation.src.perception_simulation.scene_config import SceneConfig, DynamicSceneConfig, EgoConfig, StaticSceneConfig, RelightingConfig
-from scene_generation.src.perception_simulation.perception_sim import Scene
+from perception_simulation.scene_config import SceneConfig, DynamicSceneConfig, EgoConfig, StaticSceneConfig, RelightingConfig
+from perception_simulation.perception_sim import Scene
 
 
 class GenSimGPUDriveTorchEnv(GPUDriveTorchEnv):

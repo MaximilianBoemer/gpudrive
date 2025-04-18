@@ -178,7 +178,7 @@ def rollout(
                         )
 
         # Update observations, dones, and infos
-        next_obs = env.get_obs(t=time_step)
+        next_obs = env.get_obs()
         dones = env.get_dones().bool()
         infos = env.get_infos()
         

@@ -15,6 +15,11 @@ Setup scene generation as package
 git submodule update --init --recursive
 cd external/scene_generation
 python setup.py install
+cd scene_generation
+pip install submodules/simple-knn
+pip install submodules/diff-surfel-rasterization-mcmc
+pip install submodules/diff-gaussian-rasterization-mcmc
+pip install submodules/nvdiffrast
 ```
 
 ## Training agent
