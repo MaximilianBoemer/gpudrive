@@ -4,3 +4,7 @@
 [submodule "external/json"]
 	path = external/json
 	url = https://github.com/nlohmann/json.git
+[submodule "external/scene_generation"]
+	path = external/scene_generation
+	url = https://github.com/ostjul/scene-generation
+	branch = mb/gpudriveintegration
