@@ -10,6 +10,13 @@ conda activate /mnt/miniconda3/envs/gpudrive
 export MADRONA_MWGPU_KERNEL_CACHE=./gpudrive_cache
 ```
 
+Setup scene generation as package
+```
+git submodule update --init --recursive
+cd external/scene_generation
+python setup.py install
+```
+
 ## Training agent
 ```
 python baselines/ppo/ppo_sb3.py

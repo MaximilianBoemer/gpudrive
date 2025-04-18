@@ -13,7 +13,7 @@ os.chdir(working_dir)
 from gpudrive.env.dataset import SceneDataLoader
 from gpudrive.env.config import EnvConfig
 from gpudrive.env.env_torch import GPUDriveTorchEnv
-
+from gen_sim_env import GenSimGPUDriveTorchEnv
 import logging
 logging.basicConfig(level=logging.INFO)
 
@@ -35,7 +35,7 @@ def main():
     # Dataset
     train_loader = SceneDataLoader(
         root=data_root,
-        batch_size=4, # Number of worlds
+        batch_size=1, # Number of worlds
         dataset_size=1000,
         sample_with_replacement=False,
         shuffle=False,
@@ -43,7 +43,7 @@ def main():
     print("DataLoader instantiated.")
 
     # Instantiate Environment
-    env = GPUDriveTorchEnv(
+    env = GenSimGPUDriveTorchEnv(
         config=EnvConfig(),
         data_loader=train_loader,
         max_cont_agents=64, 

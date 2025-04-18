@@ -15,7 +15,7 @@ from gpudrive.datatypes.observation import (
 from gpudrive.env.config import EnvConfig, RenderConfig
 from gpudrive.env.base_env import GPUDriveGymEnv
 from gpudrive.datatypes.trajectory import LogTrajectory
-from gpudrive.datatypes.roadgraph import GlobalRoadGraphPoints, LocalRoadGraphPoints
+from gpudrive.datatypes.roadgraph import LocalRoadGraphPoints
 from gpudrive.datatypes.info import Info
 
 from gpudrive.visualize.core import MatplotlibVisualizer
@@ -741,45 +741,7 @@ class GPUDriveTorchEnv(GPUDriveGymEnv):
                 dim=-1,
             ).flatten(start_dim=2)
 
-
-    def _get_image_obs(self, mask=None, t=None):
-        agent_state = GlobalEgoState.from_tensor(
-            self.sim.absolute_self_observation_tensor(),
-            self.backend,
-            device=self.device,
-        )
-        global_roadgraph = GlobalRoadGraphPoints.from_tensor(
-            roadgraph_tensor=self.sim.map_observation_tensor(),
-            backend=self.backend,
-            device=self.device,
-        )
-        
-        print("")
-        import os
-        save_folder = "/n/fs/pci-sharedt/mb9385/workspace/gpudrive/samples"
-        if not os.path.exists(save_folder):
-            os.makedirs(save_folder, exist_ok=True)
-        
-        # Save agent state
-        xyz = np.concatenate([i.cpu().numpy()[:, :, np.newaxis] for i in [agent_state.pos_x, agent_state.pos_y, agent_state.pos_z]], axis=-1)
-        np.save(os.path.join(save_folder, f"agent_state_xyz_{t}.npy"), xyz)
-        rotation_as_quaternion = agent_state.rotation_as_quaternion.cpu().numpy()
-        np.save(os.path.join(save_folder, f"agent_state_rot_quat_{t}.npy"), rotation_as_quaternion)
-
-        # Save global road graph
-        # TODO
-
-        # # assert num_worlds == 1
-        # # In first step initialize scene
-        # x = GPUDriveGenScene()  # TODO move to __init__
-        # x.initialize_scene(env=env, add_background=False, add_map=True, add_coord_system=False)
-
-        # # In subsequent steps just update actor positions
-        # x.update_scene(env=env, timestamp=float(t))
-        # imgs = x.render_scene(do_save_images=True, timestamp=t)  # (num_observers, num_cameras, H, W, 3)
-        # return imgs
-
-    def get_obs(self, mask=None, t=None):
+    def get_obs(self, mask=None):
         """Get observation: Combine different types of environment information into a single tensor.
 
         Returns:
@@ -789,7 +751,6 @@ class GPUDriveTorchEnv(GPUDriveGymEnv):
         partner_observations = self._get_partner_obs(mask)
         road_map_observations = self._get_road_map_obs(mask)
         lidar_observations = self._get_lidar_obs(mask)
-        image_observations = self._get_image_obs(mask, t)
 
         obs = torch.cat(
             (
