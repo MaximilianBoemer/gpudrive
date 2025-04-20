@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 import pickle
-import matplotlib.pyplot as plt
 
 working_dir = Path.cwd()
 while working_dir.name != 'gpudrive':
@@ -12,14 +11,10 @@ os.chdir(working_dir)
 
 from gpudrive.env.dataset import SceneDataLoader
 from gpudrive.env.config import EnvConfig
-from gpudrive.env.env_torch import GPUDriveTorchEnv
 from gen_sim_env import GenSimGPUDriveTorchEnv
 import logging
 logging.basicConfig(level=logging.INFO)
 
-import dataclasses
-from baselines.ppo.ppo_sb3 import load_config
-from gpudrive.env.wrappers.sb3_wrapper import SB3MultiAgentEnv
 from gpudrive.env.config import EnvConfig
 from examples.experimental.eval_utils import load_policy, rollout
 

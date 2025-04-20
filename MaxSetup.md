@@ -20,6 +20,8 @@ pip install submodules/simple-knn
 pip install submodules/diff-surfel-rasterization-mcmc
 pip install submodules/diff-gaussian-rasterization-mcmc
 pip install submodules/nvdiffrast
+pip install submodules/torchsr
+pip install submodules/metadrive  # TODO remove dependency
 ```
 
 ## Training agent

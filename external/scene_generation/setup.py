@@ -23,7 +23,8 @@ setup(
         "dash==2.14.2",
         "kornia==0.7.1",
         "py360convert==1.0.1",
-        "openexr_numpy==0.0.8"
+        "openexr_numpy==0.0.8",
+        "numpy==1.26.4"
         # Add more as needed
     ],
 )
