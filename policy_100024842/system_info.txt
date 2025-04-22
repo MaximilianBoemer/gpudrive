@@ -1,0 +1,8 @@
+- OS: Linux-5.14.0-427.40.1.el9_4.x86_64-x86_64-with-glibc2.35 # 1 SMP PREEMPT_DYNAMIC Fri Oct 4 15:22:45 EDT 2024
+- Python: 3.11.8
+- Stable-Baselines3: 2.3.2
+- PyTorch: 2.6.0+cu124
+- GPU Enabled: True
+- Numpy: 2.2.4
+- Cloudpickle: 3.1.1
+- Gymnasium: 0.29.1
