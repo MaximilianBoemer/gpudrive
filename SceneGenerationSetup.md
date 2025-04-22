@@ -1,5 +1,4 @@
-# GPUDrive
-
+# GPUDrive with Scene Generation Integration
 
 ## Setup
 ```
@@ -22,6 +21,7 @@ pip install submodules/diff-gaussian-rasterization-mcmc
 pip install submodules/nvdiffrast
 pip install submodules/torchsr
 pip install submodules/metadrive  # TODO remove dependency
+pip install ninja
 ```
 
 ## Training agent

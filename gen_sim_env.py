@@ -1,5 +1,6 @@
 
 import os
+from typing import Union
 
 import numpy as np
 import torch
@@ -22,10 +23,13 @@ class GenSimGPUDriveTorchEnv(GPUDriveTorchEnv):
         config,
         data_loader,
         max_cont_agents,
+        scene_config: SceneConfig,
+        relighting_config: RelightingConfig,
         device="cuda",
         action_type="discrete",
         render_config: RenderConfig = RenderConfig(),
         backend="torch",
+        save_folder: Union[str, None] = None
     ):
         super().__init__(
             config=config,
@@ -38,35 +42,14 @@ class GenSimGPUDriveTorchEnv(GPUDriveTorchEnv):
         )
         assert data_loader.batch_size == 1, "Number of worlds must be 1 for GenSim integration for now."
         self.add_image_obs = True
+        self.save_folder = save_folder
 
-        # TODO - move out of here and have it as an arg
-        self.scene_config = SceneConfig(
-            static_scene_config=StaticSceneConfig(
-                source_path="/n/fs/pci-sharedt/data_processed/scene-generation-results/proc_geometry/xcube_fake_colmap/segment-10275144660749673822_5755_561_5775_561_with_camera_labels",
-                model_path="/n/fs/pci-sharedt/aj0699/iccv25_final/iccv25_promptvariation_scenes/segment-102751_default",
-                sequence_folder="/n/fs/pci-sharedt/data_processed/waymo_ns/10275144660749673822_5755_561_5775_561",
-                annotation_type="waymo_annotations",
-                map2scene_txt="/n/fs/pci-sharedt/data_processed/scene-generation-results/proc_geometry/waymo_surface_reconstruction/training/segment-102751/pcd/center_0-197.txt"
-            ),
-            dynamic_scene_config=DynamicSceneConfig(),
-            ego_config=EgoConfig(
-                camera_transforms_path="/n/fs/pci-sharedt/data_processed/waymo_ns/10275144660749673822_5755_561_5775_561/transforms.json",
-                annotation_type="waymo_annotations",
-                ego_agent_id=0  # TODO - redesign to have option to have multiple ego agents - maybe get rid of ego agent concept at all
-            ),
-            gaussian_type = "2D",
-            save_folder="/n/fs/pci-sharedt/mb9385/workspace/gpudrive/save"
-        )
-        relighting_config = RelightingConfig(
-            method=None,
-            params={}
-        )
         self.gen_sim_scene = Scene(
-            scene_config=self.scene_config,
+            scene_config=scene_config,
             relighting_config=relighting_config
         )
         self.initialize_scene(
-            add_background=False,
+            add_background=True,
             add_map=False,
             add_coord_system=True
         )
@@ -88,9 +71,9 @@ class GenSimGPUDriveTorchEnv(GPUDriveTorchEnv):
         # TODO - Enable Map
         map_scene = None  # MapScene(gaussian_type=self.scene_config.gaussian_type)
 
-        dynamic_scene = DynamicScene(gaussian_type=self.scene_config.gaussian_type)
+        dynamic_scene = DynamicScene(gaussian_type=self.gen_sim_scene.scene_config.gaussian_type)
         # TODO - Enable loading asset library in the beginning and do it very fast
-        world_id = 0
+        world_id = 0  # TODO enable multiple worlds
         for agent_id in range(self.max_cont_agents):
             if self.cont_agent_mask[world_id, agent_id].item() is False:
                 continue
@@ -99,7 +82,7 @@ class GenSimGPUDriveTorchEnv(GPUDriveTorchEnv):
                 car_type="blue_panda",  # TODO come up with some pseudo random initialization scheme
                 pose_data=PoseData()
             )
-
+        
         self.gen_sim_scene.initialize_scene(
             map_scene=map_scene,
             dynamic_scene=dynamic_scene,
@@ -129,13 +112,9 @@ class GenSimGPUDriveTorchEnv(GPUDriveTorchEnv):
                 ),
                 dim=-1,
             )
-            save = False
-            if save:
-                save_images(
-                    imgs=image_observations,
-                    file_name=f"{time_step}.png",
-                    save_folder="/n/fs/pci-sharedt/mb9385/workspace/gpudrive/sample_images"
-                )
+            
+            if self.save_folder is not None:
+                save_images(imgs=image_observations, file_name=f"{time_step}.png", save_folder=self.save_folder)
 
         else:
             obs = torch.cat(
@@ -151,7 +130,7 @@ class GenSimGPUDriveTorchEnv(GPUDriveTorchEnv):
     
     def _get_image_obs(self, mask=None):
 
-        world_id = 0
+        world_id = 0  # TODO
         agent_state = GlobalEgoState.from_tensor(
             self.sim.absolute_self_observation_tensor(),
             self.backend,
@@ -190,6 +169,7 @@ class GenSimGPUDriveTorchEnv(GPUDriveTorchEnv):
         return imgs
 
 
+# TODO move in scene generation repo 
 def create_joint_img(images: dict, scale: float = 1.0, variant: str = "default"):
     third_person = images["THIRD_PERSON"]
     img_width = images["FRONT_LEFT"].shape[2]
